@@ -1,0 +1,9 @@
+一.	步骤
+1.	Create a workspace
+2.	Add PowerBI content
+3.	Register an Azure AD application
+4.	Import Nuget packages
+5.	Add app settings to web.config
+6.	Integrate Power BI content
+7.	Enhance Web UX
+8.	Configure data permissions

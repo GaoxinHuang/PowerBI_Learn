@@ -1,0 +1,80 @@
+一.	包的安装
+1.	手动安装包
+(1)	Microsoft.PowerBI.Api - 用于 PowerBI REST endpoints
+(2)	Microsoft.PowerBI.JavaScript - 用于 JavaScript web components, 自动安装 powerbi.js
+(3)	可选 Microsoft.Identity.Client - 用于 Microsoft Authentication lbirary (MSAL.NET)
+
+2.	自动安装:
+(4)	Microsoft.Rest.ClientRuntime 
+(5)	powerbi.js script 
+
+二.	配置
+1.	Add app settings to web.config 
+ <appSettings>
+    <add key="authorityUrl" value="https://login.microsoftonline.com/common/" />
+    <add key="resourceUrl" value="https://analysis.windows.net/powerbi/api" />
+    <add key="apiUrl" value="https://api.powerbi.com" />
+    <add key="embedUrlBase" value="https://app.powerbi.com" />
+	<add key="applicationId" value="b6d5ef21-edef-4d09-8e0d-9b25285fedac" />
+	<!-- 以下是 optional -->	
+	<add key="workspaceId" value="c8d2a855-92d8-4c1f-8d55-ce7f09652576" />
+	<... Encrypted embedding identity credentials  的东西>
+</appSettings>
+
+2.	配置 JS的部分	
+<script src="/script/powerbi.js" ></script>
+
+3.	简单的Html的例子
+<div id="embedDiv" styple="max-width:1000px;...."></div>
+
+三.	Server-side
+1.	Generate an access token
+2.	Generate an embed token
+	(1)	Access level (View, create, edit) -> Create | Edit only for PowerBI reports (i.e. paginated report only support view access level) 
+	(2)	Dataset ID (report creation)
+	(3)	Allow Save As (reports only)
+	(4)	One or more effective identities (if enforcing RLS)
+	
+3.	Retrieve the resource ID (reportID, DashboardID, or TileID)
+4.	Retrieve the embed URL
+
+四.	Client-side
+<script>
+1.	第一部分获取权限
+    // Read embed application token from Model
+    var accessToken = "@Model.EmbedToken.Token";
+    // Read embed URL from Model
+    var embedUrl = "@Html.Raw(Model.EmbedUrl)";
+    // Read report Id from Model
+    var embedReportId = "@Model.Id";
+	// Get models. models contains enums that can be used.
+	var models = window['powerbi-client'].models;
+2.	第二部分配置
+	var config = {
+        type: 'report', // 支持 "report"|"visual"|"dashboard"|"title"|"qna"
+        tokenType: models.TokenType.Embed, // 支持 Aad(PBI) | Embed (Non-PBI)
+        accessToken: accessToken, // 支持 Access Token(PBI) | Embed token (Non-PBI)
+        embedUrl: embedUrl,
+        id: embedReportId, // 支持 reportId | dashboardId | tileId
+        permissions: models.Permissions.All,
+        settings: {
+            filterPaneEnabled: true,
+            navContentPaneEnabled: true
+        }
+    };
+注:	不同的type, 可能有不同的settings
+
+3.	第三部分, 转化
+    // Get a reference to the embedded report HTML element
+    var reportContainer = $('#embedContainer')[0];
+    // Embed the report and display it within the div container.
+    var report = powerbi.embed(reportContainer, config);
+</script>
+
+4.	user experience - Phased embedding
+(1)	load() - 当数据加载完之后, 但是object展示之前, 可以做的操作。 比如 和report 进行一些互动, 再展示。 比如 过滤数据等等
+(2)	render() - When load() was called, makes the object visible
+
+5.	user experience - performance enhancements
+(1)	preload() 就是提前去 donload and cache scripts 在 嵌入之前, 比如在读取 第一个页面的时候, 就可以提前准备和加载这个了
+(2)	boostrap() 提前去准备 和初始化 iframe, 在 call server-side 之前

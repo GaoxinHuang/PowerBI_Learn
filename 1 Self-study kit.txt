@@ -1,0 +1,3 @@
+一.	安装的前置
+1.	PowerBI Desktop
+2.	VS 2015 以上 (VS 2019) -> 需要 ASP.NET and Web development workload

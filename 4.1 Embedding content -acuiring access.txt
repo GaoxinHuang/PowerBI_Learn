@@ -1,0 +1,64 @@
+一.	步骤
+1.	Create a workspace
+2.	Add PowerBI content
+3.	Register an Azure AD application
+4.	Import Nuget packages
+5.	Add app settings to web.config
+6.	Integrate Power BI content
+7.	Enhance Web UX
+8.	Configure data permissions
+
+二.	Register an Azure AD application
+1.	An Azure AD app is required to establish an identity for your app and to specify permissions to PowerBI REST resources
+2.	It is required when requesting an access token 
+3.	Two registration tools:
+(1)	Azure portal 
+(2)	Embedding setup tool
+4.	Permissions can also be granted programmatically 
+
+三.	Register application -> Azure portal
+1.	Use the Azure Portal to register an app
+2.	Advantages: 
+(1)	Exposes all supported permission
+(2)	Allows "granting permission"
+(3)	Allows reviewing/modfiying/deleting an app
+
+3.	Disadvantage:
+(1)	Requires accessing the Azure portal, and is time consuming and complex
+
+四.	Register application -> Embedding setup tool
+1.	Use the Embedding Setup Tool to fast track embedding:
+https://app.powerbi.com/embedsetup
+2.	It provides two paths:
+(1)	Embed for your customers 
+(2)	Embed for your organization
+
+3.	It can: 
+(1)	Register an Azure AD app, allowing delegation of common permissions
+(2)	Create a workspace
+(3)	Import a PBIX file (select a sample or your own file)
+(4)	Grant permissions for the Azure AD app
+
+4.	It provides resources:
+(1)	Configuration values (Application ID, workspace ID, and Report ID)
+(2)	Downloadable sample solution, with your configuration values inserted into its config file
+	a.	Open the sample app in Visual Studio, insert your password into the config file, and simply run to achieve your first embed
+	
+五.	Register application -> Embedding setup tool -> embed for your organization
+1.	Fast track embedding for your organization
+2.	Targeted at enterprises that want to embed analytic content on behalf of their internal users
+3.	Workflow:
+	(1)	Sign in to Power BI
+	(2)	Register your application
+	(3)	Create a workspace
+	(4)	Import content
+	
+六.	Register application -> Embedding setup tool -> embed for your customers
+1.	Fast track embedding for your customers
+2.	Targeted at any app that want to embed analytic content
+3.	Workflow:
+	(1)	Sign in to Power BI
+	(2)	Register your application
+	(3)	Create a workspace
+	(4)	Import content
+	(5)	Grant permissions

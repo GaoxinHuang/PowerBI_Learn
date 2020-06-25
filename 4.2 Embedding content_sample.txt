@@ -1,0 +1,40 @@
+一.	实际出发点
+1.	https://app.powerbi.com/embedsetup
+
+二.	PowerBI - for your customer
+1.	https://app.powerbi.com/embedsetup 的操作如下 
+Step 1 Sign in -> 点 Sign in 即可
+Step 2 Register your application -> 写下你的名字, 选中所有权限即可 -> 就会生成 application id 等等
+Step 3 Create a workspace -> 	 写下你的名字
+Step 4 Import content -> 可以上传自己的 或者 直接点 samp PowerBI report 
+Step 5 Grant permissions -> 点确定 即可
+
+2.	如何使用 sample application 
+(1)	下载 sample application
+(2)	修改 web.config: ->  password 给加上去
+(3)	等 reference 安装好就可以直接运行了
+
+
+三.	Workspace
+1.	如何导航到 你的 workspace
+回到 home -> Workspace -> 选中你的之前的那个 GH Demo 
+
+2.	如何操作 Datasets
+(1)	在 workspace底下 
+
+(2)	新建一个page, 做如下操作
+a.	Fields -> Date -> 将 year 放入空白处
+b.	点 Visualization -> Treemap (将 resize 够大)
+c.1	Fields -> Product -> Demographic
+c.2	Fields -> Sales -> Sales
+d.	Fields -> Region -  拖(drag) 入 Filter type 
+e.	Save -> 写上名字即可, 比如 Product Demographic.这样就会再生成一个report
+
+四.	Dashboard 
+Reports -> 绑定到 dashboard  - 视频就是把原本的 US sales report 改成 Dashboard
+1.	Reports -> US sales -> bin(整个) ->  new -> 名字
+2.	-> bin  Quantity 和 Sales and Avg Price by Month -> 都绑定到 刚刚创建的新的里
+3.	reports -> Product Demographic -> bin Sales
+4.	Dashboards -> US sales -> 调整下 size 和摆放
+5.	点 "Ask a question about your data" -> type "sales by state where region is New England as map" 
+	就会自动生成地图版的数据

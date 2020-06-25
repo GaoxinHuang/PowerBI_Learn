@@ -1,0 +1,109 @@
+L1
+一.	概念
+1.	two different token types 
+(1)	App token (access token) - For your organization scenario. have identity permission to Power BI REST API
+(2)	Embed token - For your customer scenario. claims to access specific Power BI content
+
+2.	Expired time for Access Token - By default, it expires after an hour
+
+3.	Authentication flow differs, based on whether the app uses impersonation to embed Power BI content
+
+4.	Two Authentication flow scenario:
+(1)	For your organization (SaaS):
+	
+(2)	For your customers (PaaS)
+
+二.	For your organization
+1.	功能和需求
+	a.	end users have Power BI accounts and appropriate licenses
+	b.	The end user's account is used to authenticate with Power BI
+	c.	The user's identity is used to access content and query datasets
+	d.	Support for teams and sharepoint
+	e.	Licensing: A SKUs not supported
+	
+2.	Authentication flow
+(1)	End user 请求 PowerBI content->
+(2)	App 用 user 的 identity, 来获取 access token
+(3)	App uses the access token to embed any PowerBI content the end user has permission to view
+
+3.	considerations (注意事项)
+(1)	Teams and SharePoint embedding are examples of for your organization embedding
+(2)	Consider using the for your organization scenario when you want:
+a.	A custom experience instead of the PowerBI service 
+b.	Integration of PowerBI content with other content
+c.	Data access permissions to be those of the end user
+d.	Customized audit loggin
+
+三.	For your customers
+1.	功能和需求
+(1)	When using your app, the end user doest not require a Power BI account or licenses
+(2)	An embedding identity is used to authenticate with Power BI and acts as a proxy for the end user - it is either a:
+a.	Master app account
+b.	Service principal
+(3)	An embed token is required to embed Power BI content using an effective identity
+(4)	Requires specific licensing (SKUs: A, EM or P)
+
+2.	Authentication flow
+(1)	End user 请求 PowerBI content->
+(2)	App uses an embedding identity to acquire an access token 
+(3)	App caches the access token and uses it to generate an embed token to embed Power BI Content
+
+3.	Proxy -> Master app account
+(1)	A master app account is a regular Azure AD user
+(2)	When used to access PowerBI content:
+a.	The app will use the user account to acquire an access token 
+b.	It must be an admin of the workspace that contains content to embed
+c.	It must have a PowerBI Pro license
+
+4.	Proxy -> Service principal
+(1)	An Azure service principal is a security identity used by apps 
+(2)	It has a specific role and tightly controlled permission to access resources 
+	a.	It can authenticate using a password (secret) or certificate
+(3)	When used to access Power BI content:
+a.	The app will use the service principal to acquire an access token 
+b.	It must be an admin of workspace that contains content to embed
+c.	It does not need a PowerBI Pro license
+(3)	A power BI tenant admin must enable use of service principals, and register service principal security groups
+
+5.	Comparing proxy methods
+(1)	Master app account:
+a.	Dedicated capacity required - yes
+b.	Azure AD object type - User account
+c.	Credential management - Frequent password changes
+d.	Power BI tenant settings - 
+e.	Power BI API usage - All
+f.	Power BI service sign in - Supported 
+g.	Licensing - PowerBI Pro license required
+
+(2)	Service principal
+a.	Dedicated capacity required - yes
+b.	Azure AD object type - Service principal
+c.	Credential management - Secret rotation management
+d.	Power BI tenant settings - User must be enabled, and service principal must belong to a declared secruity group
+e.	Power BI API usage - All except the Admin operation group and gateway APIs
+f.	Power BI service sign in - Not Supported
+g.	Licensing - Power BI Pro license not required
+
+6.	Acuiqring an access token - Prxy method guidance
+(1)	Generally:
+	a.	Master app account is a good choice for dev/test:
+	(a)	It is easy to setup 
+	(b)	It can be used to sign in to the Power BI portal to help troubleshoot issues
+	(c)	But - it requires a PowerBI Pro license
+	b.	Service principal is a good choice for production:
+	(a)	It is more secure
+	(b)	It supports better automation and scale
+	(c)	There is less management overhead
+	(d)	But - it requires Azure AD and Power BI admin rihgts to setup and manage
+		i.	Consider creating a dedicated Azure AD domain
+		ii.	App developers can be granted full control, and it will be isolated from the company's domain
+	
+7.	Acuiring an embed token 
+(1)	An embed Token must be acquired to embed Power BI content, when using the for your customers scenario
+(2)	An embed token represents several facts:
+	a.	PowerBI content that can be accessed 
+	b.	Access level (View, create, or edit)
+	c.	Duration that the content can be accessed 
+	d.	Optionally, effective identities used to access content, and in turn, query datasets
+(3)	It expires when the access token expires
+	a.	An app can be developed to silently refresh the embed token when it expires

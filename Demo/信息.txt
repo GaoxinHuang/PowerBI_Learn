@@ -1,0 +1,7 @@
+User: Godfrey Huang
+Email: godfrey.huang@CAPACITY247DEV.COM
+Application: GH Demo
+Application ID:b6d5ef21-edef-4d09-8e0d-9b25285fedac
+Workspace: GH Demo
+Workspace ID:c8d2a855-92d8-4c1f-8d55-ce7f09652576
+Report ID:89eee5c5-c92d-40cd-bfdf-0c4ac01a9743
