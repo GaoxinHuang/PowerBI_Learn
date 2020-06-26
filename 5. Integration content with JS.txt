@@ -1,0 +1,38 @@
+一.	概念
+1.	capabilities:
+(1)	User interactions are natively supported by the report view
+(2)	User interactions can trigger subscribable events
+(3)	Programmatic interactions
+(4)	Dynamic report layouts
+(5)	Capture and share bookmarks
+(6)	Report visual creation and personalization
+(7)	Embed token regeneration, when expired (SetAccessToken method)
+
+2.	JS 能干吗:
+(1)	Embed a specific report 
+(2)	Get/Set/Remove report/page/visual filters
+(3)	Update settings
+(4)	Print
+(5) Save report, Save as Report
+(6)Full screen mode
+(7)Extend option/context menu
+(8)Apply custom layout
+(9)Show/Hiden visual headers
+(10)Bookmarks
+(11) Visual type/capabilities/property
+....
+二.	JS events
+1.	Power BI reports
+(1)	Page changed
+(2)	Data selected
+(3)	Bookmark applied
+(4)	SaveAs trigger
+2.	Power BI report visuals
+(1)	Embed a specific report visual
+(2)	Data selected
+3.	Paginated reports
+(1)	Embed a specific report
+(2)	Full screen mode
+4.	Dashboard
+(1)	Tile clicked
+(2)	full screen mode
