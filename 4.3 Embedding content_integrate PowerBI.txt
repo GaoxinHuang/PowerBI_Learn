@@ -18,7 +18,12 @@
 	<add key="applicationId" value="b6d5ef21-edef-4d09-8e0d-9b25285fedac" />
 	<!-- 以下是 optional -->	
 	<add key="workspaceId" value="c8d2a855-92d8-4c1f-8d55-ce7f09652576" />
-	<... Encrypted embedding identity credentials  的东西>
+	<... Encrypted embedding identity credentials  的东西>, 
+	注:	比如
+	 <!-- Note: Do NOT leave your credentials on code. Save them in secure place. -->
+    <add key="pbiUsername" value="xxx" />
+    <add key="pbiPassword" value="xxx" />
+	
 </appSettings>
 
 2.	配置 JS的部分	

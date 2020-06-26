@@ -1,0 +1,78 @@
+一.	实际操作 - 后端 
+1.	安装包
+(1)	Microsoft.PowerBI.Api - 用于 PowerBI REST endpoints
+(2)	Microsoft.PowerBI.JavaScript - 用于 JavaScript web components, 自动安装 powerbi.js
+(3)	可选 Microsoft.Identity.Client - 用于 Microsoft Authentication lbirary (MSAL.NET)
+
+2.	配置 web.config
+<appSettings>
+	<add key="authorityUrl" value="https://login.microsoftonline.com/common/" />
+    <add key="resourceUrl" value="https://analysis.windows.net/powerbi/api" />
+    <add key="apiUrl" value="https://api.powerbi.com" />
+    <add key="embedUrlBase" value="https://app.powerbi.com" />
+	<add key="applicationId" value="b6d5ef21-edef-4d09-8e0d-9b25285fedac" />
+	<add key="workspaceId" value="c8d2a855-92d8-4c1f-8d55-ce7f09652576" />
+    <add key="pbiUsername" value="xxxx" />
+    <add key="pbiPassword" value="xxxx" />
+</appSettings>
+
+3.	读取config:  
+(1)	sample -> Services/EmbedService.cs 
+(2)	视频中 -> 添加一个 Configurations.cs
+public class Configurations{
+	public static readonly string AuthorityUrl = ConfigurationManager.AppSettings["authorityUrl"];
+	........
+}
+
+4.	获取 Token Credentials - 其实就是 Bearer token
+(1)	sample -> Services/EmbedService.cs 
+
+(2)	视频中 (代码过时了)
+a.	https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2
+b.	代码
+app = PublicClientApplicationBuilder.Create(Configurations.ApplicationId.ToString())
+	.WithAuthority(Configurations.AuthorityUrl).Build();
+var acounts = app.GetAccountsAsync().GetAwaiter().GetResult();
+.... (代码过时, 就不继续写了)
+
+5.	或 PowerReport 
+(1)	sample -> Services/EmbedService.cs 
+
+(2)	视频中 PowerBIClient client 扩展用法
+a.	设置 drop down list
+var reports = client.Reports.GetReportsInGroup(WorkpaceId);
+foreach(Report item in reports.Value){
+	ddlReports.Items.Add(new ListItem(item.Name, item.Id.ToString()));
+	//注: ddlReport 就是 dropdown list
+}
+
+b.	读取 embedToken 和 embedUrl
+var generateTokenRequestParameters = new GenerateTokenRequest(TokenAccessLevel.View);
+var tokenResponse = client.Reports.GenerateTokenInGroup(workspaceId, reportId, generateTokenRequestParameters) ;
+embedToken = tokenResponse.Token;
+embedUrl = report.EmbedUrl;
+reportId = report.Id;
+
+注：	GenerateTokenRequest 是package里自带的
+
+二.	实际操作 - 前端 (以 WebForm 为例)
+1.	前端的操作
+    var accessToken = "@Model.EmbedToken.Token";
+    var embedUrl = "@Html.Raw(Model.EmbedUrl)";
+    var embedReportId = "@Model.Id";
+    var models = window['powerbi-client'].models;
+
+    var config = {
+        type: 'report',
+        tokenType: models.TokenType.Embed,
+        accessToken: accessToken,
+        embedUrl: embedUrl,
+        id: embedReportId,
+        permissions: models.Permissions.All,
+        settings: {
+            filterPaneEnabled: true,
+            navContentPaneEnabled: true
+        }
+    };
+	
+    var report = powerbi.embed(reportContainer, config);

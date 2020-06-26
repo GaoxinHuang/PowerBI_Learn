@@ -1,0 +1,19 @@
+一.	Dashboard 的部分
+1.	后端的修改：	
+(1)单个dashboards 没有item.name, 但是 item.DisplayName
+(2)	client.reports 改成 client.Dashboard 之类的
+
+2.	前端的修改:	
+(1)	config的修改 
+a.	settings 改成: pageView: "acutalSize", 比如其他等等
+b.	type:'dashboard',
+
+二.	Q & A  -> 就是 可以问问题, 然后返回不同的 data
+1.	后端的修改:
+(1)	将 client.reports 改成 client.Dataset 之类的
+(2)	
+
+2.	前端的修改:
+(1)	config 修改:
+a.	type:'qna',
+b.	viewMode: models.QnaMode.Interactive
