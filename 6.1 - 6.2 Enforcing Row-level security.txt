@@ -1,0 +1,146 @@
+L6.1 - Role 
+注: RLS = Row-level security 
+一. 概念
+1.  目的 - Configure data permissions 
+(1) App developers can restrict access to data by mapping users to roles at run-time
+(2) A signle secured master report can be delivered to many users, each with different data access requirements
+(3) Data permission also apply to dashboards and tiles
+(4) by default, models (datasets) allow all users to see "all data"
+(5) Hower, that "all" may already restricted by what the embedding identity account can see
+    a.  Data source user (e.g. Azure SQL Database supports RLS by user name that was used to connect)
+    b.  Filters applied to model quieries (DirectQuery mode)
+
+2.  举例说明
+User1 和 User2 去看同样一个的report, 但是因为权限不一样, 
+所以给他们的 Model data 不同, report 的数据也不同 
+
+3.  PowerBI dataset types
+(1) RLS implementation will depend on the type of dataset:
+a.  Interal hosted (hosted in the PowerBI service):
+(a) Import (cached) model
+(b) DirectQuery or Composite model
+b.  External models(live connections):
+(a) Azure Analysis Services
+(b) SQL Server Analysis Services (via gateway to on-premises, or IaaS)
+总结: 分三种: (1) Import    (2) Composite/DirectQuery   (3) Live Connection to AS (Azure AS) 
+
+4.  Roles 
+(1) Roles are design to restrict access to model data by surfacing only specific rows to specific users, supported by:
+a.  Analysis Services live connections (roles defined in external models)
+b.  PowerBI Desktop developed models (roles defined in PowerBI hosted models)
+
+(2) 教程备注:   
+a.  There is not need to create any roles if all users require access to all data
+b.  This course will focus discussion on implementation RLS in Power BI Desktop
+
+(3) Roles 和 Rules的关系
+a.  Roles define one or more rules 
+b.  Rules enforce table row filters, defined by using DAX expressions
+    (a) Expressions must evaluate to true of false
+    (b) Expressions can be static or dynamic (i.e. use run-time information)
+    (c) When the expression evaluates are true, the row is retrieve
+c.  Users can be assigned to more than one role in which case permission sets are combined
+    (a) However, it is generally not a good practice to assign users to multiple roles as it can result in unexpected results - test thoroughly
+    (b) Strive to encapsulate all rules into a signle role
+d.  Effective data permissions depend on a good model design, with correctly configured relationships
+    (a) Commonly, rules are assigned to "dimension" type tables, and relationship filer propagation ensures restricted access to data in related tables
+    (b) Note: if an applied filter returns zero row, then filter propagation ensures that related tables also return zero rows
+f.  Static Rules apply filter expressions by using constant values
+    (a)To retireve no table rows, set the expression to false (比如 Region = "x", x不存在, 就是永远的false)
+
+g.  Roles -> Validation 
+    (a) In Power BI Desktop, it is possible to validate permissions by viewing the report via one or more roles
+    (b) Validation also allow passing in a value for the effective user name (but not custom data)
+
+L6.2    Effective Identity
+一. 概念
+1.  在生成token的时候, 至少一个 Effective Identity 必须传递过来, 而且包括以下内容:
+(1) Username 
+(2) a list of one or more Dataset IDs
+optionally 包括:
+(1) A list of one or more role assignments 
+(2) Custom data value
+
+2.  Multiple effective Identity Objects may be required to embed a dashbaord(When tiles source data from multiple datasets)
+
+二. 代码演示
+var generateTokenRquestParameters = new GenerateTokenRquest(
+    TokenAccessLeve.View, 
+    new EffectiveIdentity(
+        username: CurrentUser.UPN,
+        roles: new List<string> {"Managers"},
+        databases: new List<string>{    report.DatasetId }
+    )
+);
+var tokenResponse = client.Reports.generateTokenInGroup(AppWorkspaceId, report.Id, generateTokenRquestParameters);
+
+三. Dataset type
+1.  Recall that RLS implementation will depend on the typle of databset:
+(1) External models (live connections):
+    a.  Azure Analysis Services
+    b.  SQL Server Analysis Services (via gateway to on-premises or IaaS)
+(2) Internal models (hosted in the PowerBI service):
+    a.  Import (cached) model
+    b.  DirectQuery model
+
+2.  Azure Analysis Services 
+(1) Master app account or service principal must have at least read permission on the model
+(2) To enforce RLS, pass EffectiveIdentity:
+    a.  Username must be a master app account (UPN format) or service principal(Object ID)
+    b.  One or more roles must be defined in the model
+    c.  Role must be passed to limit data visibility by enforcing rules
+    d.  DAX Username function will always return the master app account
+    e.  DAX customdata function will return any string value passed by EffectiveIdentity through the CustomData property
+
+3.  SQL Server Analysis Services 
+(1) Gateway data source credentials must be an Analysis Services admin
+(2) Embedding identity account must be a gateway admin
+    a.  Service principal can only be added by using the API
+(3) If no EffectiveIdentity is passed:
+    a.  When the embedding identity account is an Analysis Services admin, all users can view all model data
+    b.  When the embedding identity account is not an Analysis Services admin, data visibility will be limited by roles
+        assigned to the master app account
+(4) To enforce RLS, pass EffectiveIdentity:
+    a.  Username must be a windows account 
+    b.  Username must have read permission on the model
+    c.  One or more roles must be deined in the model 
+    d.  Role cam be passed to limit data visibility by enforcing rules
+    e.  DAX Username function will return the username passed by EffectiveIdentity
+    f.  DAX customdata function is not supported
+
+4.  PowerBI import model 
+(1) Embedding identity account already has access to all data in the model
+(2) If no EffectiveIdentity is passed - All users can view all model data
+(3) To enforce RLS, pass EffectiveIdentity:
+    a.  Username must be passed, but does not need be a real user name
+    b.  One or more roles must be defined in the model
+    c.  Role must be passed to limit data visibility by enforcing rules
+    d.  DAX Username function will return the "user name" passed by effectiveIdentity
+    e.  DAX customdata function is not supported
+
+5.  Power BI DirectQuery model
+(1) Embedding identity account already has access to all data in the model
+(2) Data source is queried by the credentials stored for the data source
+(3) If no EffectiveIdentity is passed - All users can view all model data according to the permissions of the data source account
+(4) To enforce RLS, pass EffectiveIdentity[基本和import一样]:
+    a.  Username must be passed, but does not need be a real user name
+    b.  One or more roles must be defined in the model
+    c.  Role must be passed to limit data visibility by enforcing rules
+    d.  DAX Username function will return the "user name" passed by effectiveIdentity
+    e.  DAX customdata function is not supported
+
+四. Good design practices
+1.  Strive to enforce data permission through roles, not app logic
+2.  Strive to reach scale by authoring secure master reports delivering different data to different users
+3.  Strive to define fewer models, with well-designed roles
+4.  Strive to define fewer roles, leveraging dynamic filter
+5.  When possible, create roles/rules on "dimension" type tables, rather than "fact" type table(more efficient)
+6.  Verify that the model design, including relationships and relationship properties, are correctly configured
+7.  ......
+
+五. Considerations and limitations
+1.  If a model does not deine roles, the GnerateToken() request must not be passed EffectiveIdentity, other than the mebedding identity account
+2.  If a PowerBI hosted model deines roles, EffectiveIdentity must include at least one role
+3.  The list of EffectiveIdentity objects defined multiple identity tokens for dashboard embedding 
+    - for all other resource, the list contains a signle identity
+4.  Embedding the Q&A experience is only supported for PowerBI import models

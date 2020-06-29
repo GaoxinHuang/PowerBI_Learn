@@ -1,0 +1,38 @@
+一. PowerBI Desktop (略)
+
+二. 代码部分
+1.1 c# 的代码(在 controller 层) -> Web form: Token request parameters(static role)
+var generateTokenRquestParameters = new GenerateTokenRquest(
+    TokenAccessLeve.View, 
+    new EffectiveIdentity(
+        username: CurrentUser.UPN,
+        roles: new List<string> {"Midwest", "New England"},
+        databases: new List<string>{    report.DatasetId }
+    )
+);
+var tokenResponse = client.Reports.generateTokenInGroup(WorkspaceId, report.Id, generateTokenRquestParameters);
+.............
+结果: 只显示 "Midwest", "New England" 的数据
+
+1.2 提升版 (动态的)
+var generateTokenRquestParameters = new GenerateTokenRquest(
+    TokenAccessLeve.View, 
+    new EffectiveIdentity(
+        username: ddRegion.SelectedValue,
+        roles: new List<string> {"Region"},
+        databases: new List<string>{    report.DatasetId }
+    )
+);
+结果: 只显示下拉表中的 selected 的那个的数据 
+
+2.  不同的role的不同权限
+(1) xx.cshtml (就是多个 人名的下拉框)
+(2) c#获取数据的部分
+var generateTokenRquestParameters = new GenerateTokenRquest(
+    TokenAccessLeve.View, 
+    new EffectiveIdentity(
+        username: ddlManager.SelectedValue,
+        roles: new List<string> {"Manager"},
+        databases: new List<string>{    report.DatasetId }
+    )
+);
