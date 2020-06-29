@@ -1,0 +1,16 @@
+一. 资源
+1. https://github.com/microsoft/PowerBI-JavaScript
+(1) 对应的 demo 链接(在 github底下就有): https://microsoft.github.io/PowerBI-JavaScript/demo/v2-demo/index.html
+
+二. 几个功能展示 - 都是点 demo 的link 再到那些具体代码
+1.  实际找案例代码的步骤:
+a.  demo - https://microsoft.github.io/PowerBI-JavaScript/demo/v2-demo/index.html
+b.  -> Showcase
+c.  -> 选择想要的 案例 -> 点 start
+
+2.  展示的案例如下
+(1) Custom layout - 不同的布局
+(2) capture bookmark - 创建不同的 bookmark, 然后可以给链接, 直接跳到 那个bookmark (包括 filter 等)
+(3) Personalize report design - 不同颜色自定义, theme的内容 等等
+(4) Insight to action 
+(5) Quick visual creator - 各种功能, 比如 自定义的filter，自定义的模型 等等 (包括 print 的功能)

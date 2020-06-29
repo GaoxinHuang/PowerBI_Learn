@@ -1,0 +1,13 @@
+一. PowerBI embedding licensing
+1.  Embedding PowerBI analytics required licensing 
+2.  Tow options:
+    (1) PowerBI Premium (P SKU or EM SKU)
+    (2) Azure PowerBI embedded (A SKU)
+3.  One exception An account with a PowerBI Pro license can generate a finit number of embed tokens
+    (1) Provided strictly for evaluation or development puerpose
+    (2) They are not permitted to be used for production workloads
+
+二. 概要总结:
+1.  Azure PowerBI embedded - Use the Azure Resource Manager API to mange PowerBI Embedding capacities with PowerShell commands
+2.  A SKU - 就是 Azure Portal. 就是 Power BI embedded 
+    EM SKU & P SKU 就是 Office 365. 就是 Power BI Premium
