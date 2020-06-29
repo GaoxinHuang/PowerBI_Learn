@@ -1,3 +1,4 @@
+L5.1 理论 - integration content with JS
 一.	概念
 1.	capabilities:
 (1)	User interactions are natively supported by the report view
@@ -36,3 +37,62 @@
 4.	Dashboard
 (1)	Tile clicked
 (2)	full screen mode
+
+L5.2 实践 - integration content with JS
+一.	filter 功能的实现
+1.  function 代码如下 在 .cshtml里
+function filterRegion(){
+    var report=powerbi.embeds[0];
+    var ddl = document.getElementById("ddlfilterRegion");
+    if(region == "*"){
+        report.removeFilter().catch(error =>{...});
+        return;
+    }
+    const basicFilter = {
+        "$schema":"http://powerbi.com/product/schema#basic",
+        "target":{
+            "table":"Region",
+            "column":"Region"
+        },
+        "operator": "In",
+        "values":[region]
+    }
+    report.setFilter([basickFilter]).catch(error=>{...})
+}
+
+注: 就是有我们自己的组件(下拉列表), 
+    当下拉列表更新, 数据也会更新。PowerBI 里面的过滤列表也会更新
+
+二. 修改鼠标右键的指令
+1.  config settings
+extensions:[
+    {
+        command:{
+            name:"cmdShowValue",
+            title:"Show value in MessageBox",
+            selector:{
+                 "$schema":"http://powerbi.com/product/schema#visualSelector",
+                 visualName:"VisualContainer7" // Sales and Avg price by Month
+            },
+            extend: {
+                visualContextMenu:{
+                    title:"show value in message"
+                }
+            }
+        }
+    }
+]
+
+2.  event handler
+report.on("commandTriggered", function(command){
+    var commandDetails = command.detail;
+    if(commandDetails.command=="cmdShowValue"){
+        var category = commandDetails.dataPoints[0].identity[0].equals;
+        var value = commandDetails.dataPoints[0].values[0].formattedValue;
+        alert(category+"value is "+value);
+    }
+});
+
+3.  效果如下:
+(1) 右键 visual -> Show Value in Message
+(2) alert 数据
